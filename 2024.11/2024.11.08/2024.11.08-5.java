@@ -1,6 +1,5 @@
-package org.example.solutions;
 
-// https://leetcode.com/problems/contains-duplicate
+// https://leetcode.com/problems/single-number/solutions/1771720/c-easy-solutions-sorting-xor-maps-or-frequency-array/
 
 import java.util.*;
 
@@ -20,6 +19,4 @@ class Solution {
         return set.stream().findFirst().get();
     }
 }
-
-
 
