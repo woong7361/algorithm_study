@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://leetcode.com/problems/intersection-of-two-arrays-ii/
 
 import java.util.*;
@@ -34,5 +32,3 @@ class Solution {
         return result;
     }
 }
-
-
