@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://leetcode.com/problems/add-two-numbers/
 
 import java.util.*;
