@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://leetcode.com/problems/top-k-frequent-elements/
 
 import java.util.*;
