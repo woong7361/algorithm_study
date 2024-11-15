@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://leetcode.com/problems/permutations/
 
 import java.util.*;
