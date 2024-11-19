@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://leetcode.com/problems/count-and-say/
 
 import java.util.*;
