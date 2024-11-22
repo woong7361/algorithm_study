@@ -1,50 +1,22 @@
-// https://school.programmers.co.kr/learn/courses/30/lessons/340213?language=java
+// https://school.programmers.co.kr/learn/courses/30/lessons/340199
 
 import java.util.*;
 
 class Solution {
-    public String solution(String video_len, String pos, String op_start, String op_end, String[] commands) {
-
-        // 현재 오프닝 사이에 있다면 오프닝 끝으로 이동
-        if (transToSecond(pos) >= transToSecond(op_start) && transToSecond(pos) <= transToSecond(op_end)) {
-            pos = op_end;
+    public int solution(int[] wallet, int[] bill) {
+        int answer = 1;
+        while (Math.max(bill[0], bill[1]) > Math.max(wallet[0], wallet[1]) || Math.min(bill[0], bill[1]) > Math.min(wallet[0], wallet[1])) {
+            answer += 1;
+            bill = fold(bill);
         }
 
-        for (String command : commands) {
-            if (command.equals("next")) {
-                pos = transToMinutes(transToSecond(pos) + 10);
-            } else if (command.equals("prev")) {
-                pos = transToMinutes(transToSecond(pos) - 10);
-            }
-
-            // video보다 length 보다 크면 length
-            if (transToSecond(pos) > transToSecond(video_len)) {
-                pos = video_len;
-            }
-            // 0보다 작으면 0
-            if (transToSecond(pos) < 0) {
-                pos = "00:00";
-            }
-
-            // 현재 오프닝 사이에 있다면 오프닝 끝으로 이동
-            if (transToSecond(pos) >= transToSecond(op_start) && transToSecond(pos) <= transToSecond(op_end)) {
-                pos = op_end;
-            }
-        }
-
-        return pos;
+        return answer;
     }
 
+    public int[] fold(int[] bill) {
+        int big = Math.max(bill[0], bill[1]) / 2;
+        int small = Math.min(bill[0], bill[1]);
 
-    public int transToSecond(String current){
-        String[] split = current.split(":");
-        return Integer.parseInt(split[0]) * 60 + Integer.parseInt(split[1]);
-    }
-
-    public String transToMinutes(int seconds){
-        int minute = seconds / 60;
-        int second = seconds % 60;
-
-        return String.format("%02d:%02d", minute, second);
+        return new int[]{big, small};
     }
 }
