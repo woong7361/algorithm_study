@@ -1,61 +1,38 @@
-// https://school.programmers.co.kr/learn/courses/30/lessons/250121?language=java
+package org.example.solutions;
 
+// https://school.programmers.co.kr/learn/courses/30/lessons/181188
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 class Solution {
-    public int[][] solution(int[][] data, String ext, int val_ext, String sort_by) {
-        int[][] answer;
+    public long solution(int r1, int r2) {
+        long answer = 0;
 
-        // code, data, maximum, remain
-        // ext -> one of these
-        // val_ext -> less than
-        // sort by -> one of these ,ASC sort
+        long r1Pow = (long) r1 * r1;
+        long r2Pow = (long) r2 * r2;
 
-        // ext & val ext -> filtering function 4
-        List<int[]> dataList;
-        if (ext.equals("code")){
-            dataList = Arrays.stream(data)
-                    .filter(d -> d[0] < val_ext)
-                    .collect(Collectors.toList());
-        } else if (ext.equals("date")) {
-            dataList = Arrays.stream(data)
-                    .filter(d -> d[1] < val_ext)
-                    .collect(Collectors.toList());
-        } else if (ext.equals("maximum")) {
-            dataList = Arrays.stream(data)
-                    .filter(d -> d[2] < val_ext)
-                    .collect(Collectors.toList());
-        } else if (ext.equals("remain")) {
-            dataList = Arrays.stream(data)
-                    .filter(d -> d[3] < val_ext)
-                    .collect(Collectors.toList());
-        } else {
-            throw new IllegalArgumentException("not match ext");
+        // x 0부터 r2 까지 구하기
+        for (long x = 0; x < r1; x++) {
+            long xPow = x * x;
+            // 위는 r2, 아래는 r1으로 시작해서 현재 x위치에서 가장 윗점, 아랫점 찾기
+            int maxC = (int) Math.floor(Math.sqrt(r2Pow - xPow));
+            int minC = (int) Math.ceil(Math.sqrt(r1Pow - xPow));
+
+            if (maxC - minC < 0) {
+                continue;
+            }
+
+            answer = answer + (maxC - minC + 1) * 4;
         }
+        answer = answer - (r2 - r1 + 1) * 2;
 
-        // sort_by -> sorting function 4
-        if (ext.equals("code")){
-            dataList
-                    .sort((source, target) -> Integer.compare(source[0], target[0]));
-        } else if (ext.equals("date")) {
-            dataList
-                    .sort((source, target) -> Integer.compare(source[1], target[1]));
-        } else if (ext.equals("maximum")) {
-            dataList
-                    .sort((source, target) -> Integer.compare(source[2], target[2]));
-        } else if (ext.equals("remain")) {
-            dataList
-                    .sort((source, target) -> Integer.compare(source[3], target[3]));
-        } else {
-            throw new IllegalArgumentException("not match sort_element");
+        for (long x = r1; x < r2+1; x++) {
+            long xPow = x * x;
+
+            int maxC = (int) Math.floor(Math.sqrt(r2Pow - xPow));
+
+
+            answer = answer + (maxC * 2 + 1) * 2;
         }
-
-        answer = dataList.toArray(new int[dataList.size()][]);
 
         return answer;
     }
