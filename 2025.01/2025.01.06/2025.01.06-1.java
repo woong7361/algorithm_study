@@ -1,47 +1,34 @@
-// https://school.programmers.co.kr/learn/courses/30/lessons/178870
+package org.example.solutions;
 
+// https://school.programmers.co.kr/learn/courses/30/lessons/176963
+
+
+import java.util.HashMap;
 
 class Solution {
-    public int[] solution(int[] sequence, int k) {
-        int[] answer = {0, 1000001};
-        // 합이 k인 부분수열
+    public int[] solution(String[] name, int[] yearning, String[][] photo) {
+        int[] answer = new int[photo.length];
 
-        // 왼쪽 p1, 오른쪽 p2
-        // p1 ~ p2의 합 sum1
-        // sum1 < k p2 한칸 오른쪽
-        // sum1 == k 기록
-        // sum1 > k p1 오른쪽
-        // 만약 원소 하나가 k보다 크다면 그냥 끝내기 (최적화용)
-        int length = sequence.length;
+        // 추억점수
+        // 사진속에 나오는 인물의 그리움 점수 합산
+        // 사람이 다수일때는 각 사람의 그리움 점수 합산
 
-        int p1 = 0;
-        int p2 = 0;
-        int sumSeq = sequence[0];
+        // name 그리워하는 사람들
+        // 각 사람별 그리움점수 정수 배열 yearning
 
-        // p2가 마지막일때 까지
-        while (p2 < length){
-            // p2++
-            if (sequence[p2] > k) {
-                break;
+        // name -> yearning map 생성 - 그리움 점수 map
+        // photo iter
+        //  photo 내부의 사람들이 yearning map에 있다면 점수 추가, 없다면 넘어가기
+
+        HashMap<String, Integer> yearningMap = new HashMap<>();
+        for (int i = 0; i < name.length; i++) {
+            yearningMap.put(name[i], yearning[i]);
+        }
+
+        for (int i = 0; i < photo.length; i++) {
+            for (String personInPhoto : photo[i]) {
+                answer[i] += yearningMap.getOrDefault(personInPhoto, 0);
             }
-
-            sumSeq += sequence[p2];
-
-            //sumSeq > k 라면 p1 조정
-            while (sumSeq > k) {
-                sumSeq -= sequence[p1];
-                p1 += 1;
-            }
-
-            // sumSeq == k인지 확인 하고 answer 처리
-            if (sumSeq == k) {
-                if (p2 - p1 < answer[1] - answer[0]) {
-                    answer[0] = p1;
-                    answer[1] = p2;
-                }
-            }
-
-            p2 += 1;
         }
 
         return answer;
