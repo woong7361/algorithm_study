@@ -1,6 +1,6 @@
-package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/176962
+
+// https://school.programmers.co.kr/learn/courses/30/lessons/172928?language=java
 
 
 import java.util.*;
