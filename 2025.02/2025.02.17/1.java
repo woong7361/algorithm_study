@@ -1,29 +1,32 @@
-// https://school.programmers.co.kr/learn/courses/30/lessons/142086
-// 00 start
+// https://school.programmers.co.kr/learn/courses/30/lessons/148653
+// 03 start
 
-
-import java.util.HashMap;
 
 class Solution {
-    public int[] solution(String s) {
-        int[] answer = new int[s.length()];
-        HashMap<Character, Integer> characterIntegerHashMap = new HashMap<>();
+    public int solution(int storey) {
+        int answer = 0;
 
-        // char가 처음 나오면 -1  & 갱신
-        // char가 두번째 나오면 현재 INDEX - 마지막 나온 INDEX & 갱신
+        // 10의 배수로 만들기
+        // <5 -가 빠름 5> +가 빠름 ==5 앞자리 숫자를 보고 +or-결정
 
-        for (int i = 0; i < s.length(); i++) {
-            char character = s.charAt(i);
+        while (storey > 0) {
+            int digit = storey % 10;
+            storey /= 10;
 
-            Integer lastIndex = characterIntegerHashMap.getOrDefault(character, -1);
-
-            if (lastIndex == -1) {
-                answer[i] = -1;
-            } else {
-                answer[i] = i - lastIndex;
+            if (digit == 5) {
+                if (storey % 10 >= 5) {
+                    answer += (10 - digit);
+                    storey++;
+                } else {
+                    answer += digit;
+                }
+            } else if (digit > 5) {
+                answer += (10 - digit);
+                storey++;
             }
-
-            characterIntegerHashMap.put(character, i);
+            else{
+                answer += digit;
+            }
         }
 
         return answer;
