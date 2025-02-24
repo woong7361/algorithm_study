@@ -1,7 +1,6 @@
-package org.example.solutions;
+// https://school.programmers.co.kr/learn/courses/30/lessons/155652
+// 52 start
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/155651
-// 13 start
 
 
 import java.util.*;
@@ -54,11 +53,6 @@ class Solution {
             answer = Math.max(answer, usingRoomCount);
         }
 
-        endTimeList.addAll(List.of(1, 2, 3));
-
-        while (!endTimeList.isEmpty()) {
-            System.out.println("endTimeList = " + endTimeList.poll());
-        }
         return answer;
     }
 }
