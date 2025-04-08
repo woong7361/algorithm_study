@@ -1,76 +1,53 @@
-package org.example.solutions;
-
-// https://school.programmers.co.kr/learn/courses/30/lessons/81302
-// 54 start
-
-
 import java.util.*;
 
 class Solution {
-    public int[] solution(String[][] places) {
-        int[] answer = new int[places.length];
-        // 대기실 5개, 각 대시길 크기는 5*5 크기
-        // 응시자들끼리 맨해튼 거리가 2이하로 앉지 않기
-        // 단 응시자가 앉아있는 자리 사이가 파티션으로 막혀있을 경우 허용
+    public long[] solution(long[] numbers) {
+        long[] answer = new long[numbers.length];
+        // fx: x보다 크고 x와 비트가 1~2개 다른수중 제일 작은 수
 
-        // 거리두기를 잘 지키고 있는지 확인
+        // f2 = 3   10   11
+        // f7 = 11  111 -> 1011
+        // fn 은?
 
-        //맨해튼 거리 = (r1, c1), (r2, c2) -> |r1 - r2| + |c1 - c2|
         // 해결방법
-        // dfs로 visit한다. 파티션은 통과하지 못한다. 상하좌우만으로 이동이 가능하다.
+        // 일단 x보다 커야한다. -> 2진수로 만들었을때 한개를 0 -> 1로 바꾸거나, 1개를 0->1 로 바꾸고 그 아랫 자리를 1->0으로 바꾼다.  (2가지)
+        // 그중 제일 작은 수를 선택한다.
 
-        // !! 사람을 찾는다 -> 이동거리가 2 이내에 다른 사람이 존재한다? (상하좌우만으로 이동) -> 있다면 X, 없다면 계속
-        for (int index = 0; index < places.length; index++) {
-            int result = 1;
-            String[] board = places[index];
-            for (int row = 0; row < 5; row++) {
-                for (int col = 0; col < 5; col++) {
+        // x를 2진수로 만든다. -> string
+        // 1. x의 가장 작은 자릿수의 0에서 1을 추가할때 한가지 수를 list에 추가한다. (0->1 1개)
 
-                    // 사람이라면
-                    if (board[row].charAt(col) == 'P') {
-                        boolean[][] visit = new boolean[5][5];
-                        for (boolean[] booleans : visit) {
-                            Arrays.fill(booleans, false);
-                        }
-                        if (!validateDistance(board, row, col, 0, visit)) {
-                            result = 0;
-                            break;
-                        }
-                    }
-                }
-            }
+        // 2.   x에 padding 0 추가
+        //      x뒤에 1이 있다면 x에서 가장 작은 자릿수의 0을 1로 변경 후, 그 아랫 자릿수의 1을 0으로 변경(0->1, 1->0 1개)
+        // 010
+        // 011
+        // 01
+        // 0
 
-            answer[index] = result;
+        for (int i = 0; i < numbers.length; i++) {
+            answer[i] = functionX(numbers[i]);
         }
 
         return answer;
     }
 
-    private boolean validateDistance(String[] board, int row, int col, int distance, boolean[][] visit) {
-        int[][] ways = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    private long functionX(long number) {
+        long result = -1;
 
-        if (visit[row][col]) {
-            return true;
-        }
-        if (distance > 2) {
-            return true;
-        }
-
-        if (distance != 0 && board[row].charAt(col) == 'P') {
-            return false;
-        } else if (board[row].charAt(col) == 'X') {
-            return true;
-        }
-
-        visit[row][col] = true;
-
-        boolean result = true;
-        for (int[] way : ways) {
-            if (row + way[0] < 0 || row + way[0] >= 5 || col + way[1] < 0 || col + way[1] >= 5) {
-                continue;
+        long index = 0;
+        long temp = number;
+        while (temp >= 0) {
+            if (temp % 2 == 0L && index == 0) {
+                result = Math.max(result, number + (long) Math.pow(2, index));
+                break;
+            } else if (temp % 2 == 0) {
+                result = Math.max(result, number + (long) Math.pow(2, index) - (long) Math.pow(2, index - 1));
+                break;
             }
-            result = result && validateDistance(board, row + way[0], col + way[1], distance + 1, visit);
+
+            index += 1;
+            temp = temp / 2L;
         }
+        System.out.println("0->1 result = " + result);
 
         return result;
     }
