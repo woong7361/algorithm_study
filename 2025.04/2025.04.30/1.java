@@ -1,9 +1,3 @@
-package org.example.solutions;
-
-// https://school.programmers.co.kr/learn/courses/30/lessons/67257
-// 51 start
-
-
 import java.util.*;
 
 class Solution {
