@@ -1,56 +1,54 @@
-// https://school.programmers.co.kr/learn/courses/30/lessons/142085
-// 18 start
+// https://school.programmers.co.kr/learn/courses/30/lessons/42883
+// 39 start
 
 
-import java.util.PriorityQueue;
+import java.util.*;
 
 class Solution {
-    public int solution(int n, int k, int[] enemy) {
-        int answer = 0;
-        // 디펜스 게임
-        // 병사 n명
-        // 라운드마다 enemy[i] 적
-        // 병사와 적의 1대1 교환비
-        // 무적권 k번 가능
-        // 최대한 많은 수의 라운드 진행하고파
+    public String solution(String number, int k) {
+        String answer = "";
 
-        // 무적권? 어떻게 해야함
+        // 어떤 숫자에서 k개의 숫자를 제거했을 때 얻을 수 있는 가장 큰 수는?
+        // ex. 1924 -> 1,2 제거 -> 94 가장 큰 수
 
-        // 해결법
-        // 가장 큰거에 무적권 쓰면 되는거 아님?
-        // 1. enemy를 더해가면서 n을 넘어갈때를 찾는다. ( 안넘어가면 끝 )
-        // 2. 그 바로 전에서 최대값을 무적권을 사용한다.
-        // 3. 다음 값을 추가해가며 또 다른 최대값을 찾는다.
+        // 정렬...
+        // 남은 수를 기준으로 세기
 
-        // ! 최댓값은 어떻게 할 것이냐 변수 1개는 안되는데 -> priority Queue 사용 MaxHeap
+        int resultSize = number.length() - k;
 
-        int enemySum = 0;
-        PriorityQueue<Integer> queue = new PriorityQueue<>();
+        LinkedList<Integer> result = new LinkedList<>();
+        result.add(Character.getNumericValue(number.charAt(0)));
+        for (int i = 1; i < number.length(); i++) {
+            int num = Character.getNumericValue(number.charAt(i));
 
-        int index = 0;
-        for (index = 0; index < enemy.length; index++) {
-            // 넘어가나요?
-            enemySum += enemy[index];
-            queue.add(-enemy[index]);
-            if (enemySum > n) {
+            // 남은 수 = 목표 수 - 현재 수
+            int remainCnt = number.length() - i + result.size() - resultSize;
 
-                // 넘어갔을떄 무적권이 있나요?
-                if (k > 0 && !queue.isEmpty()) {
-                    int maxValue = -queue.poll();
-                    enemySum -= maxValue;
-                    k -= 1;
-                } else {
-                    index -= 1;
+            while (!result.isEmpty() && remainCnt > 0) {
+                remainCnt--;
+                Integer prevNum = result.getLast();
+
+                if (prevNum >= num) {
                     break;
+                } else {
+                    result.removeLast();
                 }
             }
+
+            if (result.size() < resultSize) {
+                result.add(num);
+            }
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Integer i : result) {
+            builder.append(i);
         }
 
-        index += 1;
-
-        if (index > enemy.length) {
-            return enemy.length;
-        }
-        return index;
+        // 1231234
+        // 32 | 남은수 34
+        // 남은수 2개, 현재수 2개, 목표수 4개 -> 0번
+        // 남은수 3개, 현재수 2개, 목표수 4개 -> 1번 빼기 가능
+        // 남은수 + 현재수 - 목표수
+        return builder.toString();
     }
 }

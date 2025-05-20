@@ -1,89 +1,56 @@
 package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/42890
+// https://school.programmers.co.kr/learn/courses/30/lessons/42883
 // 39 start
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 class Solution {
-    static List<HashSet<Integer>> resultList = new ArrayList<>();
-    public int solution(String[][] relation) {
-        resultList = new ArrayList<>();
-        // 후보키의 최대 개수를 구하시오
-        // 유일성 & 최소성을 만족
+    public String solution(String number, int k) {
+        String answer = "";
 
-        // 컬럼은 8개 이하
-        // row는 20개 이하
+        // 어떤 숫자에서 k개의 숫자를 제거했을 때 얻을 수 있는 가장 큰 수는?
+        // ex. 1924 -> 1,2 제거 -> 94 가장 큰 수
 
-        // 해결방안
-        // 전탐색
-        // 1 ... n 까지,
-        // 유일성 검사 -> SET 으로 해결
-        // 최소성 검사 -> LIST CONTAIN 연산으로 해결
-        for (int i = 1; i < relation[0].length + 1; i++) {
-            permutation(relation, new HashSet<>(), i);
-        }
+        // 정렬...
+        // 남은 수를 기준으로 세기
 
-        return resultList.size();
-    }
+        int resultSize = number.length() - k;
 
-    // 자기 이후 번호(컬럼)만 재귀
-    private void permutation(String[][] relation, HashSet<Integer> key, int size) {
-        // 원소의 개수가 작은 순서대로 실행
-        if (key.size() == size) {
-            // 유일성 체크
-            if (uniqueTest(key)) {
-                return;
+        LinkedList<Integer> result = new LinkedList<>();
+        result.add(Character.getNumericValue(number.charAt(0)));
+        for (int i = 1; i < number.length(); i++) {
+            int num = Character.getNumericValue(number.charAt(i));
+
+            // 남은 수 = 목표 수 - 현재 수
+            int remainCnt = number.length() - i + result.size() - resultSize;
+
+            while (!result.isEmpty() && remainCnt > 0) {
+                remainCnt--;
+                Integer prevNum = result.getLast();
+
+                if (prevNum >= num) {
+                    break;
+                } else {
+                    result.removeLast();
+                }
             }
 
-            // 최소성 체크
-            if (minimalityTest(relation, key)) {
-                resultList.add(new HashSet<>(key));
+            if (result.size() < resultSize) {
+                result.add(num);
             }
-
-            return;
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Integer i : result) {
+            builder.append(i);
         }
 
-        // 재귀
-        OptionalInt OptionalMax = key.stream()
-                .mapToInt(it -> Integer.valueOf(it))
-                .max();
-
-        for (int column = OptionalMax.isEmpty() ? 0 : OptionalMax.getAsInt() + 1; column < relation[0].length; column++) {
-            key.add(column);
-            permutation(relation, key, size);
-            key.remove(Integer.valueOf(column));
-        }
-    }
-
-    private boolean uniqueTest(HashSet<Integer> key) {
-        return resultList.stream()
-                .anyMatch(candidateKey -> key.containsAll(candidateKey));
-    }
-
-    private boolean minimalityTest(String[][] relation, HashSet<Integer> key) {
-        HashSet<String> set = Arrays.stream(relation)
-                .map(row -> {
-                    StringBuilder value = new StringBuilder();
-                    key
-                            .stream()
-                            .forEach(column -> value.append(row[column]));
-
-                    return value.toString();
-                })
-                .collect(Collectors.toCollection(HashSet::new));
-
-        return set.size() == relation.length;
-    }
-
-    private String getKeyString(HashSet<Integer> key) {
-        StringBuilder t = new StringBuilder();
-
-        key.stream()
-                .map(String::valueOf)
-                .forEach(t::append);
-        return t.toString();
+        // 1231234
+        // 32 | 남은수 34
+        // 남은수 2개, 현재수 2개, 목표수 4개 -> 0번
+        // 남은수 3개, 현재수 2개, 목표수 4개 -> 1번 빼기 가능
+        // 남은수 + 현재수 - 목표수
+        return builder.toString();
     }
 }
