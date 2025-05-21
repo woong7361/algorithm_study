@@ -1,56 +1,77 @@
 package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/42883
+// https://school.programmers.co.kr/learn/courses/30/lessons/42860
 // 39 start
 
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 class Solution {
-    public String solution(String number, int k) {
-        String answer = "";
+    public int solution(String name) {
+        int answer = 0;
 
-        // 어떤 숫자에서 k개의 숫자를 제거했을 때 얻을 수 있는 가장 큰 수는?
-        // ex. 1924 -> 1,2 제거 -> 94 가장 큰 수
+        // 처음에는 A로만 이루어져 있다. (각 자리수마다)
+        // 조이스특만을 이용해 글자를 만들기
+        // 위: 다음 알파벳, 아래: 이전 알파벳, 왼쪽: 커서를 왼쪽으로, 오른쪽: 커서를 오른쪽으로
+        // 가장 빠른 방법은?
 
-        // 정렬...
-        // 남은 수를 기준으로 세기
 
-        int resultSize = number.length() - k;
+        // ! 각 알파벳이 얼마나 움직여야하는가?
+        // ! 어느 방향으로 움직여야 가장 빠른가?
 
-        LinkedList<Integer> result = new LinkedList<>();
-        result.add(Character.getNumericValue(number.charAt(0)));
-        for (int i = 1; i < number.length(); i++) {
-            int num = Character.getNumericValue(number.charAt(i));
+        // 1. 각 자리수에서 얼마나 움직여야하는지 계산 (절댓값 계산 A -> Z or Z -> A 정방향 역방향)
+        //      1) 윗 방향: char (target) - char a
+        //      2) 아랫 방향: a -> z = 1: char z - char (target) + 1
+        // 2. 움직여야하는 방향 계산하기
+        //      1) 왼쪽으로 쭉, 2) 오른쪽으로 쭉, 3) 왼쪽 오른쪽
 
-            // 남은 수 = 목표 수 - 현재 수
-            int remainCnt = number.length() - i + result.size() - resultSize;
+        IntStream moveStream = name.chars()
+                .map(target -> {
+                    return Math.min(target - 'A', 'Z' - target + 1);
+                });
 
-            while (!result.isEmpty() && remainCnt > 0) {
-                remainCnt--;
-                Integer prevNum = result.getLast();
+        int[] array = moveStream
+                .map(it -> it > 0 ? 0 : -1)
+                .toArray();
 
-                if (prevNum >= num) {
-                    break;
-                } else {
-                    result.removeLast();
-                }
-            }
+        int[] visit = new int[name.length()];
+        Arrays.fill(visit, -1);
+        find(Arrays.copyOf(array, array.length), visit, 0);
 
-            if (result.size() < resultSize) {
-                result.add(num);
-            }
-        }
-        StringBuilder builder = new StringBuilder();
-        for (Integer i : result) {
-            builder.append(i);
-        }
 
-        // 1231234
-        // 32 | 남은수 34
-        // 남은수 2개, 현재수 2개, 목표수 4개 -> 0번
-        // 남은수 3개, 현재수 2개, 목표수 4개 -> 1번 빼기 가능
-        // 남은수 + 현재수 - 목표수
-        return builder.toString();
+        return answer;
     }
+
+    private int find(int[] dest, int[] visit, int index) {
+        // 전부 방문했다면 끝
+        if (allVisit(dest, visit)) {
+            return 0;
+        }
+
+        // 오른쪽 방문, 왼쪽 방문
+        int leftIndex = index - 1 < 0 ? dest.length - 1 : index - 1;
+        visit[leftIndex] = 1;
+        int a = find(dest, visit, leftIndex);
+        visit[leftIndex] = -1;
+
+        int rightIndex = (index + 1) % dest.length;
+        visit[rightIndex] = 1;
+        int b = find(dest, visit, rightIndex);
+        visit[rightIndex] = 1;
+
+        return Math.min(a, b) + 1;
+    }
+
+    private boolean allVisit(int[] dest, int[] visit) {
+        for (int index = 0; index < dest.length; index++) {
+            if (!(dest[index] == 0 && visit[index] > 0)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
 }
