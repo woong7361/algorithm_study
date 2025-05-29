@@ -1,8 +1,3 @@
-package org.example.solutions;
-
-// https://school.programmers.co.kr/learn/courses/30/lessons/42746?language=java
-// 43 start
-
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,13 +13,6 @@ class Solution {
         // 이어붙이는 수 비교이니
         // 둘을 이어붙여서 수 비교
         // 둘중 큰수가 앞으로
-
-        // 121 12
-        // 12112 < 12121 1과 1이 같다. 그러면?
-        // 122 12
-        // 12212 > 12122  // 2가 1보다 크니까
-        // 123 12
-        // 12312 > 12123 // 3이 1보다 크니까
 
         // 0 만있다면 0으로 return
 
