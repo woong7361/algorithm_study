@@ -1,47 +1,55 @@
 package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/12911
-// 46 start
+// https://school.programmers.co.kr/learn/courses/30/lessons/12905
+// 12 start
 
 
 import java.util.*;
 
-class Solution {
-    public int solution(int n) {
-        int answer = 0;
-        // 자연수 n, n의 다음 큰 수는?
-        // n보다 큰 자연수
-        // n을 2진수로 바꾸었을 때 1을 숫자가 같다.
-        // 1,2 를 만족하는 수 중 가장 작은 수
+class Solution
+{
+    public int solution(int [][]board)
+    {
+        int answer = 1;
 
-        // 해결 방법
-        // n+1 ~ ... 시도
-        // XOR? 0011010
-        ///     1010100
-        ///     1001110
+        // 1과 0으로 채워진 표
+        // 표에서 1로 이루어진 가장 큰 정사각형을 찾아 넓이를 return 하는 함수를 만들어라
 
-        // 그냥 세야될듯
-        int curOne = toBinary(n);
+        // 문제 설계
+        // i,j 에서 사각형의 max length를 조사한다.
 
-        while(true) {
-            int nextOne = toBinary(++n);
-            if(curOne == nextOne) break;
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+
+                // row,col == '1'일 때
+                if (board[row][col] == 1) {
+                    // while length를 늘려가며 정사각형이 되는 max_legnth를 확인
+                    answer = Math.max(answer, findMaxSquareLength(board, row, col));
+                }
+
+            }
         }
-        answer = n;
 
-        return answer;
+        return answer*answer;
     }
 
-    private static int toBinary(int n) {
-        int one = 1;
+    private int findMaxSquareLength(int[][] board, int row, int col) {
+        int length = 1;
 
-        while(n > 1) {
-            if(n % 2 == 1) {
-                one++;
-            }
-            n /= 2;
+        while (row+length < board.length && col+length < board[0].length && checkSquare(board, row, col, length)) {
+            length++;
         }
 
-        return one;
+        return length;
+    }
+
+    private boolean checkSquare(int[][] board, int row, int col, int length) {
+        for (int i = 0; i < length+1; i++) {
+            if (board[row + length][col + i] == 0 || board[row + i][col + length] == 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
