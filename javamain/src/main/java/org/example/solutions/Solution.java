@@ -1,138 +1,91 @@
 package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/250134
-// 57 start
+// https://school.programmers.co.kr/learn/courses/30/lessons/214289
+// 12 start
 
 
 import java.util.Arrays;
 
 class Solution {
-    int[][] directions = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    public int solution(int temperature, int t1, int t2, int a, int b, int[] onboard) {
+        // 에어컨 쾌적한 실내온도 t1 ~ t2 유지하려함
+        // 0분에는 실내온도 = 실외온도
+        // // 에어컨을 켜 희망온도 설정 -> 원하는 값으로 변경 가능
+        // 실내온도 != 희망온도 -> 희망온도 방향으로 1 움직인다, 같다면 동일하다.
+        //  에어컨을 끄면 실내온도가 실외온도 방향으로 1 움직인다. (위 아래)
+        // 소비전력은 실내온도에 따라 달라진다. 희망온도가 실내온도와 다르면 a소비, 같다면 b 소비한다.
+        // 소비전력을 최소화시킬 때의 소비전력은?
+        // 단 승객이 탑승하지 않을 때는 희망온도를 유지하지 않아도 된다.
 
-    public int solution(int[][] maze) {
-        int answer = 0;
-        // n*m 크기의 격자 모양의 퍼즐판
-        // 빨간 수레 파란 수레
-        // 각자 시작칸에서 자신의 도착칸으로 도착해야한다.
-        // 각 턴마다 반드시 모든 수레를 상하좌우 인접한 칸 중 한칸으로 이동시켜야한다.
-        // 단 방문한 칸은 방문 금지, 도착칸에 도착한 수레는 이동 금지, 동시에 같은 칸으로 이동 금지, 수레끼리 자리 스왑 금지, 벽으로 이동 금지
-        // 퍼즐을 푸는데 가장 최소한의 값은 얼마인가?
-        // maze의 가로 길이 & 세로 길이 <= 4
+        // -10 ≤ temperature ≤ 40
+        // -10 ≤ t1 < t2 ≤ 40
+
 
         // 문제 설계
-        // 수레가 같히는 경우? -> 생각
-        // 하나가 움직였을 때 길을 막아서 더 오래걸리는 경우 -> 생각
-        // @ 가로 세로가 <=4 이니 -> 움직였을 때 -> max(b_reach, r_reach) 의 값을 계속 계산하며 가장 작은값으로 이동하는 식으로
-        // 결국 전탐색 도전 -> dfs
+        // a와 b 크기 관계 상관 X
+        // 그냥 2가지 방법이 존재
+        //  1. 온도를 올리거나 내리고 off 하는 방식
+        //  2. 희망온도에 맞게 설정해 유지하는 방식
 
-        // 문제 해결
-        // 파란 수레 이동, 빨간 수레 이동 but. swap만 잡기
-        // 각 경우의 수를 모두 시도해보기 dfs
+        // 공통 -> onboard == 0 일때 onboard == 1일 때를 맞추어 t1 or t2에 맞게 온도 맞추기
+        // 온도 맞추었을 때 (1) or (2)에 맞게 온도 유지
+        // 다시 onboard == 0 되면 다음 onboard == 1에 맞게 반복
+        // onboaod가 0밖에 안남았거나 onboard가 끝났으면 끝
 
-        boolean[][] rVisit = new boolean[maze.length][maze[0].length];
-        boolean[][] bVisit = new boolean[maze.length][maze[0].length];
-        for (int i = 0; i < maze.length; i++) {
-            Arrays.fill(rVisit[i], false);
-            Arrays.fill(bVisit[i], false);
+        // 해결방법
+        // 현재 온도 , target 온도, onboard 시기, 켜야하는 시간, 해당 시간 온도
+        // 28        26          2            2           26
+        // 28        27          2            2           26
+
+        // ! onboard가
+
+        // 유의할점
+        // 1. 그냥 두는거랑 희망온도 설정하는 거랑 같을 수도 있음
+        // 2. 온도를 올릴지 내릴지 정해야함 -> abs 차이?
+
+        int INF = Integer.MAX_VALUE;
+        int answer = INF;
+        int n = onboard.length;
+
+        // 온도 범위 [-10,40] ~> [0,50]
+        temperature += 10;
+        t1 += 10;
+        t2 += 10;
+
+        // dp[시간][온도] : 시간(분)에 온도에 도달하는 최소 소모전력
+        int[][] dp = new int[n+1][51];
+        for (int i = 0; i < n+1; i++) {
+            Arrays.fill(dp[i], INF);
         }
+        dp[0][temperature] = 0;
 
-        int[] rLocation = null;
-        int[] bLocation = null;
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[0].length; j++) {
-                if (maze[i][j] == 1) rLocation = new int[]{i, j};
-                if (maze[i][j] == 2) bLocation = new int[]{i, j};
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j <= 50; j++) {
+                if (dp[i][j] == INF) continue;  // 도달할 수 없는 경우
+                if (onboard[i] == 1 && (j < t1 || j > t2)) continue;    // 탑승자가 있고, 희망온도 범위가 아닌 경우
+
+                // AC ON
+                // 1. 희망온도를 낮춰서 실내온도 낮춤
+                if (j > 0) dp[i+1][j-1] = Math.min(dp[i+1][j-1], dp[i][j] + a);
+                // 2. 희망온도를 높혀서 실내온도 높힘
+                if (j < 50) dp[i+1][j+1] = Math.min(dp[i+1][j+1], dp[i][j] + a);
+                // 3. 희망온도 유지해서 실내온도 유지
+                dp[i+1][j] = Math.min(dp[i+1][j], dp[i][j] + b);
+
+                // AC OFF
+                int nextTemp = j;
+                // 4. 실외온도와 같아지는 방향으로 실내온도가 변함
+                if (j > temperature) nextTemp--;
+                else if (j < temperature) nextTemp++;
+                dp[i+1][nextTemp] = Math.min(dp[i+1][nextTemp], dp[i][j]);
             }
         }
-        rVisit[rLocation[0]][rLocation[1]] = true;
-        bVisit[bLocation[0]][bLocation[1]] = true;
 
-        answer = findPuzzle(maze, rVisit, bVisit, 0, rLocation, bLocation);
-
-        if (answer == Integer.MAX_VALUE) {
-            answer = 0;
+        for (int j = 0; j <= 50; j++) {
+            if (onboard[n-1] == 1 && (j < t1 || j > t2)) continue;    // 탑승자가 있고, 희망온도 범위가 아닌 경우
+            answer = Math.min(answer, dp[n-1][j]);
         }
 
         return answer;
     }
-
-    private int findPuzzle(int[][] maze, boolean[][] rVisit, boolean[][] bVisit, int depth, int[] rLocation, int[] bLocation) {
-        // goal에 도착하면 return depth
-        if (maze[rLocation[0]][rLocation[1]] == 3 && maze[bLocation[0]][bLocation[1]] == 4) {
-//            System.out.println("fin!!! R: "  + Arrays.toString(rLocation) + " B: " + Arrays.toString(bLocation) + " depth: " + depth);
-            return depth;
-        }
-//        System.out.println("R: "  + Arrays.toString(rLocation) + " B: " + Arrays.toString(bLocation) + " depth: " + depth);
-
-        int result = Integer.MAX_VALUE;
-
-        // 가능한 조합 찾기
-        // 도착지점에 있다면 움직이지 않기
-        if (maze[rLocation[0]][rLocation[1]] == 3) { // r이 도착지점이라면
-            for (int[] direction : directions) {
-                int[] newBLocation = new int[] {bLocation[0] + direction[0], bLocation[1] + direction[1]};
-                int[] newRLocation = new int[] {rLocation[0], rLocation[1]};
-
-                if(! checkFailLocation(maze,rVisit, bVisit, newRLocation, newBLocation, rLocation, bLocation)){
-                    bVisit[newBLocation[0]][newBLocation[1]] = true;
-
-                    result = Math.min(result, findPuzzle(maze, rVisit, bVisit, depth+1, newRLocation, newBLocation));
-
-                    bVisit[newBLocation[0]][newBLocation[1]] = false;
-                }
-            }
-        }else if (maze[bLocation[0]][bLocation[1]] == 4) { // b가 도착지점이라면
-            for (int[] direction : directions) {
-                int[] newBLocation = new int[] {bLocation[0], bLocation[1]};
-                int[] newRLocation = new int[] {rLocation[0] + direction[0], rLocation[1] + direction[1]};
-
-                if(! checkFailLocation(maze,rVisit, bVisit, newRLocation, newBLocation, rLocation, bLocation)){
-                    rVisit[newRLocation[0]][newRLocation[1]] = true;
-
-                    result = Math.min(result, findPuzzle(maze, rVisit, bVisit, depth+1, newRLocation, newBLocation));
-
-                    rVisit[newRLocation[0]][newRLocation[1]] = false;
-                }
-            }
-        } else { // 둘다 아니라면
-            for (int[] rDirection : directions) {
-                for (int[] bDirection : directions) {
-                    int[] newBLocation = new int[] {bLocation[0] + bDirection[0], bLocation[1] + bDirection[1]};
-                    int[] newRLocation = new int[] {rLocation[0] + rDirection[0], rLocation[1] + rDirection[1]};
-
-                    if(! checkFailLocation(maze,rVisit, bVisit, newRLocation, newBLocation, rLocation, bLocation)){
-                        rVisit[newRLocation[0]][newRLocation[1]] = true;
-                        bVisit[newBLocation[0]][newBLocation[1]] = true;
-
-                        result = Math.min(result, findPuzzle(maze, rVisit, bVisit, depth+1, newRLocation, newBLocation));
-
-                        rVisit[newRLocation[0]][newRLocation[1]] = false;
-                        bVisit[newBLocation[0]][newBLocation[1]] = false;
-                    }
-                }
-            }
-        }
-
-
-
-        return result;
-    }
-
-    private static boolean checkFailLocation(int[][] maze, boolean[][] rVisit, boolean[][] bVisit,
-                                             int[] rLocation, int[] bLocation, int[] prevRLocation, int[] prevBLocation) {
-        // 벽 밖으로 못감
-        return 0 > bLocation[0] || bLocation[0] >= maze.length || 0 > bLocation[1] || bLocation[1] >= maze[0].length ||
-                0 > rLocation[0] || rLocation[0] >= maze.length || 0 > rLocation[1] || rLocation[1] >= maze[0].length ||
-                //벽 못감
-                maze[bLocation[0]][bLocation[1]] == 5 || maze[rLocation[0]][rLocation[1]] == 5 ||
-                // visit 못감 (but. 이미 도착한 경우 생각해야함)
-                (maze[bLocation[0]][bLocation[1]] != 4 && bVisit[bLocation[0]][bLocation[1]]) ||
-                    (maze[rLocation[0]][rLocation[1]] != 3 && rVisit[rLocation[0]][rLocation[1]]) ||
-                // 같은칸 못감
-                (rLocation[0] == bLocation[0] && rLocation[1] == bLocation[1]) ||
-                // swap 못함
-                (prevBLocation[0] == rLocation[0] && prevBLocation[1] == rLocation[1] && prevRLocation[0] == bLocation[0] && prevRLocation[1] == bLocation[1])
-                ;
-    }
-
 }
