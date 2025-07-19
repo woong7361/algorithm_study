@@ -1,4 +1,3 @@
-package org.example.solutions;
 
 // https://school.programmers.co.kr/learn/courses/30/lessons/136797
 // 00 start
