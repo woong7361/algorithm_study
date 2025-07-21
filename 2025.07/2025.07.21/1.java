@@ -1,5 +1,3 @@
-package org.example.solutions;
-
 // https://school.programmers.co.kr/learn/courses/30/lessons/133500
 // 15 start
 
@@ -46,7 +44,7 @@ class Solution {
     }
 
     // 1 -> 불을 키라는 시그널, 0 -> 불을 킬 필요가 없다는 시그널
-    // 하나라도 불을 키라는 시그널이 들어온다면 켜야한다.
+    // 하나라도 불을 키라는 시그널이 들어온다면 켜야한다. 
     public int dfs(HashMap<Integer, List<Integer>> map, int cur, int before) {
         //리프 노드일 경우
         if (map.get(cur).size() == 1 && map.get(cur).get(0) == before)
