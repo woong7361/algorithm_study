@@ -1,78 +1,91 @@
 package org.example.solutions;
 
-// https://school.programmers.co.kr/learn/courses/30/lessons/131129
-// 53 start
+// https://school.programmers.co.kr/learn/courses/30/lessons/118669
+// 30 start
 
 
 import java.util.*;
 
 class Solution {
-    public int[] solution(int target) {
-        // 카운트 다운
-        // 점수를 깍아서 0으로 만드는 게임, 남은 점수보다 큰 점수를 득점하면 버스트로 실격된다.
-        // 1-20의 점수 & 싱글, 더블, 트리플 & 불, 아우터 불(구분없이 50점)
-        // 두 선수가 같은 라운드에 0점을 만들었을 때는 싱글 or 불을 더 많이 던진 선수가 우승 & 그것도 아니면 선공이 승리
+    public int[] solution(int n, int[][] paths, int[] gates, int[] summits) {
+        int[] answer = {};
 
-//        문제 설계
-        // 싱글, 불을 많이 던져야함 50 or 1~20점  (0점을 가장 빨리 만들면서)
+        // 등산 코스 정하기
+        // n개의 지점 , 1~n의 번호
+        // 출/입구, 쉼터, 산봉우리 3개중 하나
+        // 양방향 통행가능 등산로, 등산로별 소요시간이 다르다.
+        // 쉼터 혹은 산봉우리까지 휴식없이 이동시간 = intensity
+        // 출입구에서 출발하여 산봉우리중 한곳만 방문 후 출입구로 되돌아올 때  intensity 가 최소가 되도록 하는 코스는?
+        // intensity가 최소가 되는 등산코스가 여러 개라면 그중 산봉우리의 번호가 가장 낮은 등산코스를 선택합니다.
 
-        // 1 <= target <= 100000
+        // 2 <= n<= 50,000
+//        n - 1 ≤ paths의 길이 ≤ 200,000  [i, j, w], i/j: node, w: time
+        // 1 ≤ gates의 길이 ≤ n
+        // 1 ≤ summits의 길이 ≤ n
+//        gates와 summits에 등장하지 않은 지점은 모두 쉼터
 
-        // ex. 150 50 50 50   60 60 30
+        // 문제 설계
+        // 출입구가 여러개
+        // 출입구 -> 산봉우리 -> 출입구 (intensity가 최소가 되도록)
+        // A 출입구에서 시작 -> 다른 출입구 만나면 X, 정상까지 ㄱㄱ (최소값으로) 우선순위 큐 다익스트라 (같은 값은 해야함!)
+        // 가장 최소값으로 정상찍고 다른 출입구까지 가면 갱신
 
-        // 역순으로 가는게 편할듯?  상향식 dp로
-        // 0 -> 0
-        // 1 ~ 20 -> 1
-        // 21 = 20 + 1 or ...
+        // 문제 해결
 
-        // 순서는 불 시도(50) & single 시도 (1~20) & (double, triple 시도 22, ..., 60)
+        // 결과중 이동거리 최솟값으로 갱신 & 같다면 intensity 최솟값으로 갱신 & 같다면 산봉우리의 번호가 가장 작은 등산코스를 선택
 
-        Set<Integer> singleBull = new HashSet<>();
-        Set<Integer> doubleTriple = new HashSet<>();
-        for (int i = 1; i <= 20; i++) {
-            singleBull.add(i);
+        // road graph 생성 <HashMap>
+        HashMap<Integer, List<Path>> roadGraph = new HashMap<>();
+        for (int[] path : paths) {
+            roadGraph.putIfAbsent(path[0], new ArrayList<>());
+            roadGraph.putIfAbsent(path[1], new ArrayList<>());
 
-            doubleTriple.add(i * 2);
-            doubleTriple.add(i * 3);
+            roadGraph.get(path[0]).add(new Path(path[1], path[2]));
+            roadGraph.get(path[1]).add(new Path(path[0], path[2]));
         }
-        singleBull.add(50);
-        doubleTriple.removeAll(singleBull);
 
-        int[] dp = new int[target+1];
-        int[] sbCount = new int[target + 1];
-        Arrays.fill(dp, Integer.MAX_VALUE);
+        // gates 에서 시작 PriorityQueue로 다익스트라 거리 최소값 갱신
+        // 중복 출입구 & 중복 정상은 끝, intensity 갱신, !!node가 가장 작은값을 우선으로 탐색
+        for (int gate : gates) {
+            int[] visit = new int[n + 1];
 
-        dp[0] = 0;
-//        sbCount[0] = 0;
-        for (int i = 1; i <= target; i++) {
-            // dp 값을 가장 최솟값으로 갱신
-            // 그중에서 sbCount는 가장 최대값으로 갱신
+            int intensity = Integer.MAX_VALUE;
+            int peek = -1;
 
-            for (Integer t : singleBull) {
-                if (t > i) continue;
+            // 최소값이 나오면 그 최솟값의 모든 경로중 intensity가 최소, peek가 최소값을 고르면 된다.
+            PriorityQueue<Hiking> remainNode = new PriorityQueue<>((t1, t2) -> t1.cost - t2.cost);
+            remainNode.add(gate);
 
-                if (dp[i - t] + 1 < dp[i]) {
-                    dp[i] = dp[i - t] + 1;
-                    sbCount[i] = sbCount[i - t] + 1;
-                } else if (dp[i - t] + 1 == dp[i]) {
-                    sbCount[i] = Math.max(sbCount[i], sbCount[i - t] + 1);
-
-                }
-            }
-
-            for (Integer t : doubleTriple) {
-                if (t > i) continue;
-
-                if (dp[i - t] + 1 < dp[i]) {
-                    dp[i] = dp[i - t] + 1;
-                    sbCount[i] = sbCount[i - t];
-                } else if (dp[i - t] + 1 == dp[i]) {
-                    sbCount[i] = Math.max(sbCount[i], sbCount[i - t]);
-                }
-            }
 
         }
 
-        return new int[] {dp[target], sbCount[target]};
+
+        return answer;
+    }
+
+    private static class Path{
+        int node;
+        int cost;
+
+        public Path(int node, int cost) {
+            this.node = node;
+            this.cost = cost;
+        }
+    }
+
+    private static class Hiking {
+        int node;
+        int cost;
+        int maxIntensity;
+        int currentIntensity;
+        int peek;
+
+        public Hiking(int node, int cost) {
+            this.node = node;
+            this.cost = cost;
+            this.peek = -1;
+            this.maxIntensity = Integer.MAX_VALUE;
+            this.currentIntensity = 0;
+        }
     }
 }
