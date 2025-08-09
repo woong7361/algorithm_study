@@ -1,5 +1,3 @@
-package org.example;
-
 // https://www.acmicpc.net/problem/14938
 // 10 start
 
