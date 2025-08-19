@@ -1,7 +1,5 @@
-package org.example;
-
 // https://www.acmicpc.net/problem/1021
-// 03 start
+// 08 start
 
 
 import java.io.*;
