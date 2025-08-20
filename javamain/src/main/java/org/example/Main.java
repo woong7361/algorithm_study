@@ -15,66 +15,71 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 //        StringTokenizer st = new StringTokenizer(br.readLine());
 
-
-        // N개의 원소를 지니고있는 양방향 순환 큐
-
-        // 3가지 연산 가능
-        // 1. 첫번째 원소 뽑아내기
-        // 2. 왼쪽으로 한칸 이동하기
-        // 3. 오른쪽으로 한칸 이동하기
-
-        // 큐에 처음에 포함되어있던 수 N이 주어진다.
-        // 그리고 뽑아내려고 하는 원소의 위치가 주어진다. 이때 그 원소를 주어진 순서대로 뽑아내는데 드는 2번 3번 연산의 최솟값은?
+        // N과 L
+        // 합이 N이면서, 길이가 적어도 L인 연속된 음이 아닌 정수 리스트를 구하여라
 
         // 문제 설계
-        // 구현 하자
-        int answer = 0;
+        // 길이가 짝수일 때 -> (a1+an) * (n/2)    -- n은 원소의 개수
+        // 길이가 홀수일 때 -> (a1+an) * (n/2) + a[n/2]
+        // 길이가 적어도 L 이니
+        //      짝수일 때 n/2 >= L
+        //      홀수일 때 n/2 + 1 >= L
 
-        ArrayList<Integer> queue = new ArrayList<>();
-        LinkedList<Integer> targets = new LinkedList<>();
+        // n >=  (L - n%2) * 2
+        // N/n
+
+        // 1 2 3 4 -> 최소 4개 유지
+        // 1 2 3 4 5 6 7 -> 5개 N/n 가운데 3
+
+        // 시작위치 찾기 짝 수
+        // 10/2 = 5 -> a1 + an = 5 & n = 4
+        // a1 + a1 + 3 = 5
+        // a1 = 1
+        // a1 = (N/(n/2) - (n-1)) / 2
+
+        // 1 2 3 / 3 = 2
+        // a1 = 2 - n/2
+        // 1 2 3 4
+
+        int start = -1;
+        int length = -1;
 
         StringTokenizer st = new StringTokenizer(br.readLine());
         int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
+        int L = Integer.parseInt(st.nextToken());
+        // 홀 수 일때
+        //
+        for (int n = L; n <= 100; n++) {
+            // n은 원소의 수
 
-        st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < M; i++) {
-            targets.add(Integer.parseInt(st.nextToken())-1);
-        }
-        for (int i = 0; i < N; i++) {
-            queue.add(i);
-        }
+            // 짝수일 때
+            if (n % 2 == 0) {
+                // 수열로 표현 가능할 때
+                if (N % (n / 2) == 0) {
+                    int a1 = (N / (n / 2) - (n - 1)) / 2;
+                    if (a1 >= 0) {
+                        start = a1;
+                        length = n;
+                        break;
+                    }
+                }
+            } else { // 홀 수일 때
+                if (N % n == 0) {
+                    int a1 = (N / n) - (n / 2);
+                    if (a1 >= 0) {
+                        start = a1;
+                        length = n;
+                        break;
+                    }
+                }
 
-        int current = 0;
-        while (!targets.isEmpty()) {
-            int target = targets.poll();
-
-            // 우측으로 이동
-            int right = current;
-            int rightCount = 0;
-            while (!queue.get(right).equals(target)) {
-                rightCount++;
-                right = right + 1 >= queue.size() ? 0 : right + 1;
-            }
-
-            // 좌측으로 이동
-            int left = current;
-            int leftCount = 0;
-            while (!queue.get(left).equals(target)) {
-                leftCount++;
-                left = left - 1 < 0 ? queue.size() - 1 : left - 1;
-            }
-
-            answer += Math.min(rightCount, leftCount);
-
-            current = right;
-            queue.remove(current);
-            if (current == queue.size()) {
-                current = 0;
             }
         }
 
-        System.out.println(answer);
+
+        System.out.println("start = " + start);
+        System.out.println("length = " + length);
+
 
         br.close();
     }
