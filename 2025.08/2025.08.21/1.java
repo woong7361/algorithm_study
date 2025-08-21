@@ -1,9 +1,3 @@
-package org.example;
-
-// https://www.acmicpc.net/problem/1021
-// 13 start
-
-
 import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
@@ -78,6 +72,3 @@ public class Main {
             }
         }
     }
-
-
-}
