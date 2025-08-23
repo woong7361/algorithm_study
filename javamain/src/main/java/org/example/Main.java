@@ -1,7 +1,7 @@
 package org.example;
 
-// https://www.acmicpc.net/problem/1021
-// 10 start
+// https://www.acmicpc.net/problem/1034
+// 30 start
 
 
 import java.io.*;
@@ -16,75 +16,47 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 //        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        // 고층빌딩이 가장 많이 보이는 고층빌딩을 찾으려한다.
-        // 빌딩은 총 N개, 빌딩은 선분으로 표현된다.
-        // i번째 빌딩은 i,0 ` i,높이 의 선분으로 나타낼 수 있다.
-        // 선분이 막히지 않아야 보인다고 할 수 있다.
+        // line을 받는다.
+        // 0의 개수 - count를 센다.
+        //      K보다 크다면 넘긴다.
+        //      K - count % 2 == 1 넘긴다.
+        //      위의 조건이 충족된다면 Map에 추가하여 count를 증가시킨다.
+        // Map의 value중 max값을 반환한다.
 
-        // 1 <= N <= 50
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+        String[] board = new String[N];
+        HashMap<String, Integer> rowMap = new HashMap<>();
 
-        // 문제 설계
-        // 좌표라고 생각 & A와 B를 있는 직선의 방정식을 세운다.
-        // A와 B 사이의 모든 점을 확인하여 모두 직선 아래에 있다면 볼 수 있는 건물이다. (같아도 안된다.)
-        // 가장 큰 값을 찾는다.
-
-
-        int N = Integer.parseInt(br.readLine());
-
-        int[] answer = new int[N];
-        double[] buidngs = new double[N];
-
-        String[] lines = br.readLine().split(" ");
-
-        for (int i = 0; i < lines.length; i++) {
-            buidngs[i] = Double.parseDouble(lines[i]);
+        for (int i = 0; i < N; i++) {
+            board[i] = br.readLine();
         }
 
-        for (int i = 0; i < buidngs.length; i++) {
-            answer[i] = countSeeBuilding(buidngs, i);
+        int K = Integer.parseInt(br.readLine());
+
+        for (int i = 0; i < N; i++) {
+            rowMap.putIfAbsent(board[i], 0);
+
+            int zeroCount = 0;
+            for (int j = 0; j < M; j++) {
+                if (board[i].charAt(j) == '0') zeroCount++;
+            }
+
+            if (zeroCount <= K && ((K-zeroCount) % 2) == 0) {
+                rowMap.put(board[i], rowMap.get(board[i]) + 1);
+            }
         }
 
-        System.out.println(Arrays.stream(answer).max().getAsInt());
+        Integer result = rowMap
+                .values()
+                .stream()
+                .max(Comparator.comparingInt(integer -> integer))
+                .orElse(0);
+
+        System.out.println(result);
 
         br.close();
-    }
-
-    private static int countSeeBuilding(double[] buidngs, int i) {
-        // 왼쪽으로
-        int leftCount = 0;
-        int left = i - 1;
-        while (left >= 0) {
-            // 직선의 방정식 세우기
-//            (left, buidings[left]) (i, building[i])
-//            y = ((buidngs[i] - buidngs[left]) / (i - left)) * (x - left) + buidngs[left]
-            leftCount++;
-            for (int t = left + 1; t < i; t++) {
-                if (buidngs[t] >= ((buidngs[i] - buidngs[left]) / (i - left)) * (t - left) + buidngs[left]) {
-                    leftCount--;
-                    break;
-                }
-            }
-
-            left--;
-        }
-
-        // 오른쪽으로
-        int rightCount = 0;
-        int right = i + 1;
-        while (right < buidngs.length) {
-
-            rightCount++;
-            for (int t = right - 1; t > i; t--) {
-                if (buidngs[t] >= ((buidngs[right] - buidngs[i]) / (right - i)) * (t - i) + buidngs[i]) {
-                    rightCount--;
-                    break;
-                }
-            }
-
-            right++;
-        }
-
-        return leftCount + rightCount;
     }
 
 
