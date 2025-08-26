@@ -1,5 +1,3 @@
-package org.example;
-
 // https://www.acmicpc.net/problem/1010
 // 32 start
 
@@ -56,5 +54,4 @@ public class Main {
 
 
 }
-
 
