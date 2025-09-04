@@ -1,7 +1,7 @@
 package org.example;
 
-// https://www.acmicpc.net/problem/1038
-// 06 start
+// https://www.acmicpc.net/problem/1041
+// 15 start
 
 
 import java.io.*;
@@ -16,76 +16,86 @@ public class Main {
 //        StringTokenizer st = new StringTokenizer(br.readLine());
 
 
-        // 음이아닌 정수 X의 자릿수가 가장 큰 자릿수부터 감소한다면 그 수를 감소하는 수
-        // 321 950 감소수
-        // 322 958 X
-        // N번쨰 감소하는 수를 출력하라
+        // 주사위 N^3 개로 N N N 정육각형 만들기
+        // 정육각형의 보이는 수의 가장 작은 합은?
 
-        // 0은 0번쨰 감소수
-        // 1은 1번째 감소수
+        // 문제 설게
+        // 1. 하나만 보이는 주사위의 수 -> 상단면(n-2)^2 + 옆면(n-2)(n-1)*5
+        // 2. 2면만 보이는 주사위의 수 -> 4(n-2) + 4(n-1)
+        // 3. 3면만 보이는 주사위의 수 -> 4개
+        // 총?
 
-        // 1 2 3 4 5 6 7 8 9
-        // 10
-        // 20 21
-        // 30 31 32
-        // 40 41 42 43
+        // 1면만 보이는 주사위의 최솟값 -> 가장 작은 수
+        // 2면만 보이는 주사위의 수의 최솟값 -> 연결된 2면중 가장 작은 합
+        //      A F, C D, B E 가 아닌 모든 조합의 합중 최솟값
+        // 3면만 보이는 주사위의 수의 최솟값 -> 일자가 아닌 3면중 가장 작은 합
+        //      A E D, A D B, A B C, A C E
+        //      F E D, F D B, F B C, F C E 조합 중 최솟값
 
-        // 문제 설계
-        // 성공 -> +1 -> 반복
-        // 실패 -> 실패 자릿수 +1
-        // dfs? 굳이? 반복문으로 하는게?
+        long n = Integer.parseInt(br.readLine());
 
-        // 가장 큰 수
-        // 9876543210
+        HashMap<Character, Integer> dice = new HashMap<>();
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int temp = 'A';
+        for (int i = 0; i < 6; i++) {
+            dice.put((char) (temp + i), Integer.parseInt(st.nextToken()));
+        }
 
-        int N = Integer.parseInt(br.readLine());
-        if (N == 0) {
-            System.out.println(0);
+        long minOneSide = dice.values().stream()
+                .min(Comparator.comparingInt(integer -> integer))
+                .orElse(0);
+
+        if (n == 1) {
+            long sum = 0;
+            long max = 0;
+            for (Integer value : dice.values()) {
+                sum += value;
+                max = Math.max(max, value);
+            }
+            sum -= max;
+            System.out.println(sum);
             return;
         }
 
+        long minTwoSide = Integer.MAX_VALUE;
+        List<Character> keys = List.of('A', 'B', 'C', 'D', 'E', 'F');
+        for (int i = 0; i < keys.size(); i++) {
+            for (int j = i+1; j < keys.size(); j++) {
+                if (
+                        (keys.get(i).equals('A') && keys.get(j).equals('F'))
+                        || (keys.get(i).equals('C') && keys.get(j).equals('D'))
+                        || (keys.get(i).equals('B') && keys.get(j).equals('E'))
+                ) continue;
 
-        long number = 1;
-        while (number <= 9876543210L) {
-            int n = checkDecreaseNumber(number);
-
-            // if true -> N-1 & number+1
-            if (n == -1) {
-                if (--N <= 0) break;
-
-                number++;
-            }
-            // if false -> fail number + 1
-            else {
-                for (int i = 0; i < n; i++) number = number / 10;
-                number++;
-                for (int i = 0; i < n; i++) number = number * 10;
+                minTwoSide = Math.min(minTwoSide, dice.get(keys.get(i)) + dice.get(keys.get(j)));
             }
         }
 
-        if (number > 9876543210L) {
-            System.out.println(-1);
-        } else {
-            System.out.println(number);
+        Character[][] threeSides = {
+                {'A', 'E', 'D'}, {'A', 'D', 'B'}, {'A', 'B', 'C'}, {'A', 'C', 'E'}
+                , {'F', 'E', 'D'}, {'F', 'D', 'B'}, {'F', 'B', 'C'}, {'F', 'C', 'E'}
+        };
+
+        long minThreeSide = Integer.MAX_VALUE;
+        for (Character[] threeSide : threeSides) {
+            minThreeSide = Math.min(minThreeSide, dice.get(threeSide[0]) + dice.get(threeSide[1]) + dice.get(threeSide[2]));
         }
+        long result = calc(n, minOneSide, minTwoSide, minThreeSide);
+
+        System.out.println(result);
 
         br.close();
     }
 
-    private static int checkDecreaseNumber(long number) {
-        String numberString = String.valueOf(number);
+    public static long calc(long N, long face_1, long face_2, long face_3){
+        long face_one = 4*(N-1)*(N-2) + (N-2)*(N-2);
+        long face_two = 4*(N-2) + 4*(N-1);
+        long face_three = 4;
 
-        //531
-        for (int i = 0; i < numberString.length()-1; i++) {
-            long divNum = 1;
-            for (int j = 0; j < i; j++) divNum = divNum * 10;
+        long sum = 0;
+        sum = face_one*face_1 + face_two*face_2 + face_three*face_3;
+        return sum;
 
-            if ((number / (divNum*10)) % 10 <= (number / divNum) % 10) {
-                return i + 1;
-            }
-        }
-
-        return -1;
     }
 }
 
