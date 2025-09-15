@@ -1,6 +1,4 @@
-package org.example;
-
-// https://www.acmicpc.net/problem/25329
+// https://www.acmicpc.net/problem/17128
 // 48 start
 
 
